@@ -45,24 +45,22 @@ let testingIdxs : int[] = R.setdiff(range, trainingIdxs).GetValue()
 let trainingSet = iris.Rows.[trainingIdxs]
 let testingSet = iris.Rows.[testingIdxs]
 
-let x1 = R.sample([0..127], 7000, true)
-let x2 = R.sample([0..127], 7000, true)
-let y = Frame.zip (+) (x1.GetValue()) (x2.GetValue())
+let x1 : int [] = R.sample([0..127], 7000, true).GetValue()
+let x2  : int [] = R.sample([0..127], 7000, true).GetValue()
+
+let add (x,y) = x + y
 
 
+let y = Array.zip x1 x2
+        |> Array.map add
 
+let yBin = R.int2bin (y, length=8)
+let x1bin = R.int2bin (x1, length=8)
+let x2bin = R.int2bin (x2, length=8)
 
+let x = R.array(R.c(x1bin,x2bin), dim=R.c(R.dim(x1bin),2))
 
-let y = 
-    Frame.zip
-    
-
-R.int2bin (R.sample([0..127], 7000, true), length=8) 
-
-
-let y
-
-let lstm = R.trainr(y,  , 0.05, network__type="lstm")
+let lstm = R.trainr(yBin, x , 0.05,  hidden__dim=10)
 
 
 let nn = 
