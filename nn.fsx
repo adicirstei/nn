@@ -11,7 +11,7 @@
 // R.install_packages("neuralnet")
 // R.install_packages("caret")
 // R.install_packages("zoo")
-
+// R.install_packages("rnn")
 
 
 open Deedle
@@ -22,7 +22,11 @@ open RProvider.datasets
 open RProvider.neuralnet
 open RProvider.caret
 open RProvider.graphics
- 
+open RProvider.rnn
+
+
+
+
 let iris : Frame<int, string> = R.iris.GetValue()
 
 let features =
@@ -41,11 +45,31 @@ let testingIdxs : int[] = R.setdiff(range, trainingIdxs).GetValue()
 let trainingSet = iris.Rows.[trainingIdxs]
 let testingSet = iris.Rows.[testingIdxs]
 
+let x1 = R.sample([0..127], 7000, true)
+let x2 = R.sample([0..127], 7000, true)
+let y = Frame.zip (+) (x1.GetValue()) (x2.GetValue())
+
+
+
+
+
+let y = 
+    Frame.zip
+    
+
+R.int2bin (R.sample([0..127], 7000, true), length=8) 
+
+
+let y
+
+let lstm = R.trainr(y,  , 0.05, network__type="lstm")
+
+
 let nn = 
     R.neuralnet(
         "Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width", 
-        data = trainingSet, hidden = R.c(3,2), 
-        err_fct = "ce", linear_output = true)
+        data = trainingSet, hidden = R.c(10,5, 5), 
+        err_fct = "ce", linear_output = true, lifesign="full")
  
 // Plot the resulting neural network with coefficients
 R.eval(R.parse(text="library(grid)"))
